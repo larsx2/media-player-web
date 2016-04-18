@@ -4,14 +4,14 @@ var router = express.Router();
 var db = require('../db');
 
 
-router.post('/like', function(req, res) {
-    var songId = req.body.songId;
+router.post('/like/:songId', function(req, res) {
+    var songId = req.params.songId;
 
     if (! songId) {
         return res.status(400).send({
             errors: [{ 
                 id: "Missing song id",
-                message: "Expected valid song id on every vote",
+                message: "Expected valid song id",
             }]
         });
     }
