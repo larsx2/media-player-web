@@ -27,10 +27,23 @@ var Song = mongoose.model('Song', SongSchema, 'songs');
 var PlaylistSchema = new Schema({
     venue: String,
     updated_at: Date,
-    songs: [SongSchema],
+    songs: [{ type: Schema.Types.ObjectId, ref: 'Song' }],
 });
 var Playlist = mongoose.model('Playlist', PlaylistSchema, 'playlists');
 
+var AlbumSchema = new Schema({
+    name: String,
+    image_url: String,
+    songs: [{ type: Schema.Types.ObjectId, ref: 'Song' }],
+    artists: { type: Schema.Types.ObjectId, ref: 'Artist' },
+});
+var Album = mongoose.model('Album', AlbumSchema, 'albums');
+
+var ArtistSchema = new Schema({
+    name: String,
+    albums: [{ type: Schema.Types.ObjectId, ref: 'Albums' }],
+});
+var Artist = mongoose.model('Artist', ArtistSchema, 'artists');
 
 exports.authenticate = function(email, password, callback) {
     User.findOne({
@@ -77,6 +90,15 @@ exports.voteSong = function(songId, voter, callback) {
     });
 };
 
+exports.getPlaylist = function(playlistName, callback) {
+    Playlist.findOne({ venue: playlistName }, function(err, playlist) {
+        if (err) return callback(err);
+        if (! playlist) return callback("Playlist not found");
+
+        callback(null, playlist);
+    });
+};
+
 exports.getAllSongs = function(callback) {
     Song.find({}, function(err, songs) {
         if (err) return callback(err);
@@ -86,12 +108,39 @@ exports.getAllSongs = function(callback) {
     });
 };
 
-exports.getPlaylist = function(playlistName, callback) {
-    Playlist.findOne({ venue: playlistName }, function(err, playlist) {
+exports.getSong = function(songId, callback) {
+    Song.findOne({ _id: songId }, function(err, song) {
         if (err) return callback(err);
-        if (! playlist) return callback("Playlist not found");
+        if (! song) return callback("Song not found");
 
-        callback(null, _.omit(playlist.toObject(), ['_id', '__v']));
+        callback(null, song);
+    });
+};
+
+exports.getAllAlbums = function(callback) {
+    Album.find({}, function(err, albums) {
+        if (err) return callback(err);
+        if (! albums) return callback("Albums not found");
+
+        callback(null, albums);
+    });
+};
+
+exports.getAlbum = function(albumId, callback) {
+    Album.findOne({ _id: albumId }, function(err, album) {
+        if (err) return callback(err);
+        if (! albums) return callback("Album not found");
+
+        callback(null, album);
+    });
+};
+
+exports.getAllArtists = function(callback) {
+    Artist.find({}, function(err, artists) {
+        if (err) return callback(err);
+        if (! artists) return callback("Artists not found");
+
+        callback(null, artists);
     });
 };
 
