@@ -7,7 +7,12 @@ router.get('/', function(req, res) {
 });
 
 router.get('/genres', function(req, res) {
-  res.send("Genres response");
+  db.getAllSongs(function(err, songs) {
+    if (err) return res.fail(500, "Failed to retrieve songs", 500);
+    if (! songs) return res.fail(404, "Songs not found", 404);
+   
+    res.succeed({ status: "Not implemented" });
+  });
 });
 
 router.get('/artists', function(req, res) {
@@ -61,7 +66,7 @@ router.get('/songs/:songId', function(req, res) {
         if (err) return res.fail(500, "Failed to retrieve song", 500);
         if (! song) return res.fail(404, "Song not found", 404);
 
-        res.succeed(null, song);
+        res.succeed(song);
     });
 });
 
