@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>audio.js</title>
+    <meta content="width=device-width, initial-scale=0.6" name="viewport">
+    <style>
+      body { color: #666; font-family: sans-serif; line-height: 1.4; }
+      h1 { color: #444; font-size: 1.2em; padding: 14px 2px 12px; margin: 0px; }
+      h1 em { font-style: normal; color: #999; }
+      a { color: #888; text-decoration: none; }
+      #wrapper { width: 400px; margin: 40px auto; }
+      
+      ol { padding: 0px; margin: 0px; list-style: decimal-leading-zero inside; color: #ccc; width: 460px; border-top: 1px solid #ccc; font-size: 0.9em; }
+      ol li { position: relative; margin: 0px; padding: 9px 2px 10px; border-bottom: 1px solid #ccc; cursor: pointer; }
+      ol li a { display: block; text-indent: -3.3ex; padding: 0px 0px 0px 20px; }
+      li.playing { color: #aaa; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); }
+      li.playing a { color: #000; }
+      li.playing:before { content: '♬'; width: 14px; height: 14px; padding: 3px; line-height: 14px; margin: 0px; position: absolute; left: -24px; top: 9px; color: #000; font-size: 13px; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); }
+      
+      #shortcuts { position: fixed; bottom: 0px; width: 100%; color: #666; font-size: 0.9em; margin: 60px 0px 0px; padding: 20px 20px 15px; background: #f3f3f3; background: rgba(240, 240, 240, 0.7); }
+      #shortcuts div { width: 460px; margin: 0px auto; }
+      #shortcuts h1 { margin: 0px 0px 6px; }
+      #shortcuts p { margin: 0px 0px 18px; }
+      #shortcuts em { font-style: normal; background: #d3d3d3; padding: 3px 9px; position: relative; left: -3px;
+        -webkit-border-radius: 4px; -moz-border-radius: 4px; -o-border-radius: 4px; border-radius: 4px;
+        -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -o-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
+
+      @media screen and (max-device-width: 480px) {
+        #wrapper { position: relative; left: -3%; }
+        #shortcuts { display: none; }
+      }
+    </style>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/jquery.noty.packaged.js"></script>
+    <script src="./js/lodash.js"></script>
+    <script src="./js/audio.min.js"></script>
+    <script>
+        function playNextSong(next) {
+            if (! next) {
+                next = $('li.playing').next();
+            }
+            if (!next.length) next = $('ol li').first();
+            setName(next);
+            next.click();
+        }
+
+        function playPrevSong(prev) {
+            if (!prev) {
+                prev = $('li.playing').prev();
+            }
+            if (!prev.length) prev = $('ol li').last();
+            setName(prev);
+            prev.click();
+        }
+
+        function setName(song) {
+            if (song.length > 0) {
+                var bandName = song.find('a').attr('data-band');
+                var songName = song.find('a > label.song-name').text();
+            }
+            else {
+                var bandName = $("li.playing a").attr("data-band")
+                var songName = $("li.playing > a > label.song-name").text()
+            }
+
+            $("#band-name").text(bandName);
+            $("#song-name").text(songName);
+        }
+
+        function notify(text, type, layout) {
+            return noty({
+                text: text,
+                type: type || 'success',
+                theme: "relax",
+                dismissQueue: true,
+                layout: layout || 'bottomRight',
+                maxVisible: 5,
+                modal: false,
+                animation: {
+                    open: 'animated flipInX',
+                    close: 'animated flipOutX'
+                },
+                timeout: 3000,
+                closeWith: ['click', 'hover'],
+                animation: {
+                    open: {height: 'toggle'}, // or Animate.css class names like: 'animated bounceInLeft'
+                    close: {height: 'toggle'}, // or Animate.css class names like: 'animated bounceOutLeft'
+                    easing: 'swing',
+                    speed: 250 // opening & closing animation speed
+                },
+            });
+        }
+     
+        $(function() {
+
+            // Setup the player to autoplay the next track
+            var a = audiojs.createAll({
+                trackEnded: function() {
+                    var $prev = $('ol li.playing');
+                    var next = $prev.next();
+                    $prev.remove();
+
+                    setName(next);
+                    if (!next.length) next = $('ol li').first();
+                    next.addClass('playing').siblings().removeClass('playing');
+                    audio.load($('a', next).attr('data-src'));
+                    audio.play();
+                }
+            });
+
+            // Load in the first track
+            var audio = a[0];
+            first = $('ol a').attr('data-src');
+            var $first = $('ol li').first();
+            $first.addClass('playing');
+            audio.load(first);
+            setName($first);
+            audio.play();
+
+            // Load in a track on click
+            $('ol li').click(function(e) {
+                e.preventDefault();
+                $(this).addClass('playing').siblings().removeClass('playing');
+                setName($(this));
+                audio.load($('a', this).attr('data-src'));
+                audio.play();
+            });
+            // Keyboard shortcuts
+            $(document).keydown(function(e) {
+                var unicode = e.charCode ? e.charCode : e.keyCode;
+                // right arrow
+                if (unicode == 39) {
+                    playNextSong()
+                        // back arrow
+                } else if (unicode == 37) {
+                    playPrevSong()
+                        // spacebar
+                } else if (unicode == 32) {
+                    audio.playPause();
+                }
+            });
+        });
+
+        function vote(songId, voter) {
+            console.log("Voting", songId, voter);
+            var $song = $("#playlist a[data-id='" + songId + "']");
+            if ($song.length) {
+                var msg = ("<b>+1</b> for '" + $song.text());
+                if (voter) {
+                    msg += "' by <b>" + voter + "</b>";
+                }
+                notify(msg);
+                var score = parseInt($song.find("label.score").text());
+                $song.find("label.score").text(score + 1);
+            }
+            else {
+                console.error("Could not find song with id `" + songId + "`");
+            }
+        }
+
+        function reorderPlaylist() {
+            var $songs = $("#playlist li").not("playing");
+
+        }
+    </script>
+  </head>
+  <body>
+    <div id="wrapper">
+        <h1><b id="song-name"></b> <em>(<span id="band-name"></span>)</em></h1>
+      <audio preload></audio>
+      <ol id="playlist">
+          <li>
+            <a href="#" data-id="1" data-band="Blue Stahli" data-src="/audio/blue_stahli.mp3">
+              <label class="song-name">Blue Stahli</label>
+              <label class="score" style="float:right;color:green">0</label></a>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-id="2" data-band="Memorium" data-src="/audio/euphoria.mp3">
+              <label class="song-name">Euphoria</label>
+              <label class="score" style="float:right;color:green">0</label></a>
+            </a>
+          </li>
+      </ol>
+    </div>
+    <!-- <div id="shortcuts"> -->
+    <!--   <div> -->
+    <!--     <h1>Keyboard shortcuts:</h1> -->
+    <!--     <p><em>&rarr;</em> Next track</p> -->
+    <!--     <p><em>&larr;</em> Previous track</p> -->
+    <!--     <p><em>Space</em> Play/pause</p> -->
+    <!--   </div> -->
+    <!-- </div> -->
+  </body>
+</html>
