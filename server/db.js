@@ -17,8 +17,8 @@ var User = mongoose.model('User', UserSchema, 'users');
 
 var SongSchema = new Schema({
     name: String,
-    band: String,
-    album: String,
+    artist: { ref: 'Artist' },
+    album: { ref: 'Album' },
     genres: Array,
     votes: Number, // for Playlist only
 });
@@ -27,7 +27,7 @@ var Song = mongoose.model('Song', SongSchema, 'songs');
 var PlaylistSchema = new Schema({
     venue: String,
     updated_at: Date,
-    songs: [{ type: Schema.Types.ObjectId, ref: 'Song' }],
+    songs: [SongSchema],
 });
 var Playlist = mongoose.model('Playlist', PlaylistSchema, 'playlists');
 
@@ -72,7 +72,8 @@ exports.voteSong = function(songId, voter, callback) {
             if (err) return callback(err);
             if (! song) return callback("Song not found");
     
-            var found = playlist.songs.id(song.id);
+            var found = playlist.songs.id(songId);
+
             if (found) {
                 found.votes += 1;
             }
