@@ -24,7 +24,7 @@ var action = require('./routes/action');
 var user = require('./routes/user');
 
 app.use(logger('dev'));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(serveStatic('web', {'index': 'playlist.html'}));
 
