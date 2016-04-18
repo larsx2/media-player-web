@@ -34,7 +34,18 @@
     <script src="./js/jquery.js"></script>
     <script src="./js/jquery.noty.packaged.js"></script>
     <script src="./js/lodash.js"></script>
+    <script src="./js/handlebars.js"></script>
     <script src="./js/audio.min.js"></script>
+    <script id="song-list" type="text/x-handlebars-template">
+       {{#each songs}}
+       <li list-id="{{id}}">
+           <a href="#" data-id="{{id}}" data-band="{{band}}" data-src="{{path}}">
+               <label class="song-name">{{name}}</label>
+               <label class="votes" style="float:right; color:green">{{votes}}</label>
+           </a>
+       </li>
+       {{/each}}
+    </script> 
     <script>
         function playNextSong(next) {
             if (! next) {
@@ -94,6 +105,8 @@
      
         $(function() {
 
+            var songList = Handlebars.compile( $("#song-list").html() );
+
             // Setup the player to autoplay the next track
             var a = audiojs.createAll({
                 trackEnded: function() {
@@ -140,6 +153,14 @@
                     audio.playPause();
                 }
             });
+
+            setTimeout(function() {
+                var songs = [
+                    { id: 1, name: "foo", band: "FooBand", album: "FooAlbum", votes: 4, path: "http://inspectlabs.com/foo" },
+                    { id: 2, name: "bar", band: "BarBand", album: "BarAlbum", votes: 5, path: "http://inspectlabs.com/foo" },
+                ];
+                $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
+            }, 0);
         });
 
         function vote(songId, voter) {
@@ -161,7 +182,6 @@
 
         function reorderPlaylist() {
             var $songs = $("#playlist li").not("playing");
-
         }
     </script>
   </head>
@@ -170,18 +190,12 @@
         <h1><b id="song-name"></b> <em>(<span id="band-name"></span>)</em></h1>
       <audio preload></audio>
       <ol id="playlist">
-          <li>
-            <a href="#" data-id="1" data-band="Blue Stahli" data-src="/audio/blue_stahli.mp3">
-              <label class="song-name">Blue Stahli</label>
-              <label class="score" style="float:right;color:green">0</label></a>
-            </a>
-          </li>
-          <li>
-            <a href="#" data-id="2" data-band="Memorium" data-src="/audio/euphoria.mp3">
-              <label class="song-name">Euphoria</label>
-              <label class="score" style="float:right;color:green">0</label></a>
-            </a>
-          </li>
+          <!-- <li> -->
+          <!--   <a href="#" data-id="1" data-band="Blue Stahli" data-src="/audio/blue_stahli.mp3"> -->
+          <!--     <label class="song-name">Blue Stahli</label> -->
+          <!--     <label class="score" style="float:right;color:green">0</label></a> -->
+          <!--   </a> -->
+          <!-- </li> -->
       </ol>
     </div>
     <!-- <div id="shortcuts"> -->
