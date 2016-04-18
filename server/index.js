@@ -34,6 +34,8 @@ app.use(cookieSession({
 }));
 
 app.use(function(req, res, next) {
+    res.contentType('application/json');
+
     res.fail = function(errorId, errorMsg, status) {
         return res.status(status || 400).json({
             errors: [{
@@ -79,8 +81,6 @@ app.post('/login', function(req, res) {
 });
 
 app.all('/*', function(req, res, next) {
-    res.contentType('application/json');
-
     if (! req.session.user) {
         return res.fail(401, "Unauthorized", 401);
     }
