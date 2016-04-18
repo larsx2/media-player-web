@@ -23,9 +23,9 @@ router.get('/artists/:artistId', function(req, res) {
     var artistId = req.params.artistId;
     db.getArtist(artistId, function(err, artist) {
         if (err) return res.fail(500, "Failed to retrieve artist", 500);
-        if (! arist) return res.fail(404, "Artist not found", 404);
+        if (! artist) return res.fail(404, "Artist not found", 404);
 
-        res.succeed(arist);
+        res.succeed(artist);
     });
 });
 
