@@ -129,7 +129,7 @@ exports.getAllAlbums = function(callback) {
 exports.getAlbum = function(albumId, callback) {
     Album.findOne({ _id: albumId }, function(err, album) {
         if (err) return callback(err);
-        if (! albums) return callback("Album not found");
+        if (! album) return callback("Album not found");
 
         callback(null, album);
     });
