@@ -144,6 +144,15 @@ exports.getAllArtists = function(callback) {
     });
 };
 
+exports.getArtist = function(artistId, callback) {
+    Artist.findOne({ _id: artistId }, function(err, artist) {
+        if (err) return callback(err);
+        if (! artist) return callback("Artist not found");
+
+        callback(null, artist);
+    });
+};
+
 exports.generateAll = function(callback) {
     var playlist = Playlist({ venue: "applebees", songs: [] });
     playlist.save();
