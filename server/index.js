@@ -33,6 +33,23 @@ app.use(cookieSession({
   secret: '2743f70422e4b22a1bbb5621721143f1df107074e489cd4bf35aae1f80cf16d3',
 }));
 
+app.use(function(req, res, next) {
+    res.fail = function(errorId, errorMsg, status) {
+        return res.status(status || 400).json({
+            errors: [{
+                id: errorId,
+                message: errorMsg,
+            }]
+        });
+    };
+
+    res.succeed = function(msg) {
+        return res.status(200).json(msg);
+    };
+
+    next();
+});
+
 wss.on('connection', function connection(ws) {
   var location = url.parse(ws.upgradeReq.url, true);
 
@@ -50,14 +67,14 @@ app.post('/login', function(req, res) {
     db.authenticate(email, password, function(err, user) {
         if (err || !user) {
             log.warn("Failed to authenticate `" + email + "`:`" + password + "`");
-            return res.status(401).send("Failed to authenticate user");
+            return res.fail(400, "Failed to authenticate user", 400);
         }
         req.session.user = {
             token: user.token,
             email: user.profile.email,
             name: user.profile.display_name,
         };
-        res.send("Welcome " + user.profile.display_name + "!");
+        res.succeed(user);
     });
 });
 
@@ -65,7 +82,7 @@ app.all('/*', function(req, res, next) {
     res.contentType('application/json');
 
     if (! req.session.user) {
-        return res.status(401).send("Unauthorized");
+        return res.fail(401, "Unauthorized", 401);
     }
 
     next();
@@ -77,15 +94,12 @@ app.use('/action', action);
 app.use('/user', user);
 
 app.use(function notFound(req, res, next) {
-    res.status(404).json({
-        status: 'error',
-        message: 'Resource not found'
-    });
+    res.fail("Not Found", "Resource not found", 404);
 });
 
 app.use(function onError(err, req, res, next) {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res.fail(500, "Something broke!", 500);
 });
 
 server.on('request', app);
