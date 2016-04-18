@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
+var db = require('../db');
 
 router.get('/', function(req, res) {
-  res.json({ "songs": [] });
+  res.redirect("/music/songs");
 });
 
 router.get('/genres', function(req, res) {
@@ -18,7 +19,17 @@ router.get('/albums', function(req, res) {
 });
 
 router.get('/songs', function(req, res) {
-  res.send("Songs response");
+    db.getAllSongs(function(err, songs) {
+        if (err) return res.fail(500, "Failed to retrieve songs");
+        res.succeed(songs);
+    });
+});
+
+router.get('/playlist', function(req, res) {
+    db.getPlaylist("applebees", function(err, playlist) {
+        if (err) return res.fail(500, "Failed to retrieve playlist");
+        res.succeed(playlist);
+    });
 });
 
 module.exports = router;
