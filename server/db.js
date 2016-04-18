@@ -17,8 +17,8 @@ var User = mongoose.model('User', UserSchema, 'users');
 
 var SongSchema = new Schema({
     name: String,
-    artist: { ref: 'Artist' },
-    album: { ref: 'Album' },
+    artist: Schema.Types.ObjectId,
+    album: Schema.Types.ObjectId,
     genres: Array,
     votes: Number, // for Playlist only
 });
@@ -34,14 +34,14 @@ var Playlist = mongoose.model('Playlist', PlaylistSchema, 'playlists');
 var AlbumSchema = new Schema({
     name: String,
     image_url: String,
-    songs: [{ type: Schema.Types.ObjectId, ref: 'Song' }],
-    artists: { type: Schema.Types.ObjectId, ref: 'Artist' },
+    songs: [],
+    artist: Schema.Types.ObjectId,
 });
 var Album = mongoose.model('Album', AlbumSchema, 'albums');
 
 var ArtistSchema = new Schema({
     name: String,
-    albums: [{ type: Schema.Types.ObjectId, ref: 'Albums' }],
+    albums: [],
 });
 var Artist = mongoose.model('Artist', ArtistSchema, 'artists');
 
