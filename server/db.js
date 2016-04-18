@@ -7,7 +7,7 @@ var log = require('winston');
 mongoose.connect('mongodb://localhost/jukebox');
 
 var UserSchema = new Schema({
-    userId: String,
+    token: String,
     name: String,
     email: String,
     password: String,
@@ -16,14 +16,19 @@ var UserSchema = new Schema({
 var User = mongoose.model('User', UserSchema);
 
 exports.authenticate = function(email, password, callback) {
-    User.findOne({ email: email, password: password }, callback);
+    User.findOne({
+        "profile.email": email,
+        password: password
+    }, function(err, user) {
+        if (err) return callback(err);
+        if (! user) return callback("User not found");
+        callback(null, user.toObject());
+    });
 };
 
-exports.getUserById = function(userId, callback) {
-    User.findOne({ userId: userId }, function(err, user) {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, _.omit(user.toObject(), ['_id']));
+exports.getUserByToken = function(token, callback) {
+    User.findOne({ token: token }, function(err, user) {
+        if (err) return callback(err);
+        callback(null, _.omit(user.toObject(), ['_id', 'password']));
     });
 };

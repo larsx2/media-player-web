@@ -3,15 +3,17 @@ var router = express.Router();
 var log = require('winston');
 var db = require('../db');
 
+// GET /user
 router.get('/', function(req, res) {
     res.redirect('/user/profile');
 });
 
+// GET /user/profile
 router.get('/profile', function(req, res) {
-    var userId = req.session.user.id;
-    db.getUserById(userId, function(err, user) {
+    var token = req.session.user.token;
+    db.getUserByToken(token, function(err, user) {
         if (err) {
-            log.error("Failure looking for user profile `" + userId + "`:", err);
+            log.error("Failure looking for user profile `" + token + "`:", err);
             return res.status(500).send("Sorry, we got an error :(");
         }
 

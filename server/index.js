@@ -52,13 +52,12 @@ app.post('/login', function(req, res) {
             log.warn("Failed to authenticate `" + email + "`:`" + password + "`");
             return res.status(401).send("Failed to authenticate user");
         }
-
         req.session.user = {
-            id: user.userId,
-            email: user.email,
-            name: user.name,
+            token: user.token,
+            email: user.profile.email,
+            name: user.profile.display_name,
         };
-        res.send("Welcome " + user.name + "!");
+        res.send("Welcome " + user.profile.display_name + "!");
     });
 });
 
