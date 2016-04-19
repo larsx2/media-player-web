@@ -27,6 +27,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(serveStatic('web', {'index': 'playlist.html'}));
+app.use(serveStatic('web/audio'));
 
 app.use(cookieSession({
   name: 'session',
