@@ -30,4 +30,27 @@ router.post('/like/:songId', function(req, res) {
     });
 });
 
+router.post('/played/:songId', function(req, res) {
+    var songId = req.params.songId;
+
+    if (! songId) {
+        return res.status(400).send({
+            errors: [{ 
+                id: "Missing song id",
+                message: "Expected valid song id",
+            }]
+        });
+    }
+
+    db.removeSongFromPlaylist(songId, function(err) {
+        if (err) {
+            return res.fail("Remove failure", err);
+        }
+
+        res.succeed({ message: "Song removed" });
+    });
+
+
+});
+
 module.exports = router;

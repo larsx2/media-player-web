@@ -93,6 +93,30 @@ exports.voteSong = function(songId, voter, callback) {
     });
 };
 
+exports.removeSongFromPlaylist = function(songId, callback) {
+    Playlist.findOne({ venue: "applebees" }, function(err, playlist) {
+        if (err) return callback(err);
+        if (! playlist) return callback("Playlist not found");
+ 
+        Song.findOne({ _id: songId }, function(err, song) {
+            if (err) return callback(err);
+            if (! song) return callback("Song not found");
+    
+            var found = playlist.songs.id(songId);
+
+            if (found) {
+                found.remove();
+            }
+
+            playlist.save(function(err) {
+                if (err) return callback(err);
+
+                callback(null, _.omit(playlist.toObject(), ['_id']));
+            });
+        });
+    });
+};
+
 exports.getPlaylist = function(playlistName, callback) {
     Playlist.findOne({ venue: playlistName }, function(err, playlist) {
         if (err) return callback(err);
