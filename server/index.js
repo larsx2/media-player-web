@@ -82,7 +82,7 @@ app.post('/login', function(req, res) {
 });
 
 app.all('/*', function(req, res, next) {
-    if (req.path === '/music/playlist') {
+    if (req.path === '/music/playlist' || _.startsWith(req.path, '/action/played')) {
         return next();
     }
 
