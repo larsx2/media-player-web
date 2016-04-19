@@ -38,8 +38,8 @@
     <script src="./js/audio.min.js"></script>
     <script id="song-list" type="text/x-handlebars-template">
        {{#each songs}}
-       <li list-id="{{id}}">
-           <a href="#" data-id="{{id}}" data-band="{{band}}" data-src="{{media_url}}">
+       <li list-id="{{_id}}">
+           <a href="#" data-id="{{_id}}" data-band="{{artist}}" data-src="{{media_url}}">
                <label class="song-name">{{name}}</label>
                <label class="votes" style="float:right; color:green">{{votes}}</label>
            </a>
