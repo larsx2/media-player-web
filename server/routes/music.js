@@ -73,7 +73,7 @@ router.get('/songs/:songId', function(req, res) {
 router.get('/playlist', function(req, res) {
     db.getPlaylist("applebees", function(err, playlist) {
         if (err) return res.fail(500, "Failed to retrieve playlist");
-        res.succeed(playlist);
+        res.succeed(playlist.songs || []);
     });
 });
 

@@ -155,11 +155,9 @@
             });
 
             setTimeout(function() {
-                var songs = [
-                    { id: 1, name: "foo", band: "FooBand", album: "FooAlbum", votes: 4, path: "http://inspectlabs.com/foo" },
-                    { id: 2, name: "bar", band: "BarBand", album: "BarAlbum", votes: 5, path: "http://inspectlabs.com/foo" },
-                ];
-                $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
+                $.getJSON("/music/playlist", function(songs) {
+                    $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
+                });
             }, 0);
         });
 
@@ -186,25 +184,17 @@
     </script>
   </head>
   <body>
+
     <div id="wrapper">
-        <h1><b id="song-name"></b> <em>(<span id="band-name"></span>)</em></h1>
+
+      <h1><b id="song-name"></b> <em>(<span id="band-name"></span>)</em></h1>
+
       <audio preload></audio>
+
       <ol id="playlist">
-          <!-- <li> -->
-          <!--   <a href="#" data-id="1" data-band="Blue Stahli" data-src="/audio/blue_stahli.mp3"> -->
-          <!--     <label class="song-name">Blue Stahli</label> -->
-          <!--     <label class="score" style="float:right;color:green">0</label></a> -->
-          <!--   </a> -->
-          <!-- </li> -->
       </ol>
+
     </div>
-    <!-- <div id="shortcuts"> -->
-    <!--   <div> -->
-    <!--     <h1>Keyboard shortcuts:</h1> -->
-    <!--     <p><em>&rarr;</em> Next track</p> -->
-    <!--     <p><em>&larr;</em> Previous track</p> -->
-    <!--     <p><em>Space</em> Play/pause</p> -->
-    <!--   </div> -->
-    <!-- </div> -->
+
   </body>
 </html>

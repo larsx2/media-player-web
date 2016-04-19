@@ -82,6 +82,10 @@ app.post('/login', function(req, res) {
 });
 
 app.all('/*', function(req, res, next) {
+    if (req.path === '/music/playlist') {
+        return next();
+    }
+
     if (! req.session.user) {
         return res.fail(401, "Unauthorized", 401);
     }
