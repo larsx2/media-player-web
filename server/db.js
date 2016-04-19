@@ -18,6 +18,7 @@ var User = mongoose.model('User', UserSchema, 'users');
 var SongSchema = new Schema({
     name: String,
     artist: Schema.Types.ObjectId,
+    artist_name: String,
     album: Schema.Types.ObjectId,
     genres: Array,
     votes: Number, // for Playlist only
