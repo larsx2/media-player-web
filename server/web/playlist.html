@@ -121,44 +121,42 @@
                     audio.play();
                 }
             });
+            $.getJSON("/music/playlist", function(songs) {
+                $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
 
-            // Load in the first track
-            var audio = a[0];
-            first = $('ol a').attr('data-src');
-            var $first = $('ol li').first();
-            $first.addClass('playing');
-            audio.load(first);
-            setName($first);
-            audio.play();
-
-            // Load in a track on click
-            $('ol li').click(function(e) {
-                e.preventDefault();
-                $(this).addClass('playing').siblings().removeClass('playing');
-                setName($(this));
-                audio.load($('a', this).attr('data-src'));
+                // Load in the first track
+                var audio = a[0];
+                first = $('ol a').attr('data-src');
+                var $first = $('ol li').first();
+                $first.addClass('playing');
+                audio.load(first);
+                setName($first);
                 audio.play();
-            });
-            // Keyboard shortcuts
-            $(document).keydown(function(e) {
-                var unicode = e.charCode ? e.charCode : e.keyCode;
-                // right arrow
-                if (unicode == 39) {
-                    playNextSong()
-                        // back arrow
-                } else if (unicode == 37) {
-                    playPrevSong()
-                        // spacebar
-                } else if (unicode == 32) {
-                    audio.playPause();
-                }
-            });
 
-            setTimeout(function() {
-                $.getJSON("/music/playlist", function(songs) {
-                    $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
+                // Load in a track on click
+                $('ol li').click(function(e) {
+                    e.preventDefault();
+                    $(this).addClass('playing').siblings().removeClass('playing');
+                    setName($(this));
+                    audio.load($('a', this).attr('data-src'));
+                    audio.play();
                 });
-            }, 0);
+                // Keyboard shortcuts
+                $(document).keydown(function(e) {
+                    var unicode = e.charCode ? e.charCode : e.keyCode;
+                    // right arrow
+                    if (unicode == 39) {
+                        playNextSong()
+                            // back arrow
+                    } else if (unicode == 37) {
+                        playPrevSong()
+                            // spacebar
+                    } else if (unicode == 32) {
+                        audio.playPause();
+                    }
+                });
+
+            });
         });
 
         function vote(songId, voter) {
