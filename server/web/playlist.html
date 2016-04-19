@@ -103,40 +103,7 @@
             });
         }
      
-        $(function() {
-
-            var songList = Handlebars.compile( $("#song-list").html() );
-
-            // Setup the player to autoplay the next track
-            var a = audiojs.createAll({
-                trackEnded: function() {
-                    var $prev = $('ol li.playing');
-
-                    var songId = $prev.attr('list-id');
-                    console.log("POST /action/played/" + songId);
-
-                    $.ajax({
-                        url: "http://jukebox.inspectlabs.com/action/played/" + songId,
-                        method: "POST",
-                        dataType: "json",
-                    })
-                    .done(function(songs) {
-                        $("#playlist").html(songList({ 
-                            songs: _.orderBy(songs, 'votes', 'desc') 
-                        }));
-
-                        var next = $prev.next();
-                        $prev.remove();
-                        setName(next);
-                        if (!next.length) next = $('ol li').first();
-                        next.addClass('playing').siblings().removeClass('playing');
-                        audio.load($('a', next).attr('data-src'));
-                        audio.play();
-                    });
-
-                }
-            });
-
+        function initPlaylist() {
             $.getJSON("/music/playlist", function(songs) {
                 $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
 
@@ -157,6 +124,7 @@
                     audio.load($('a', this).attr('data-src'));
                     audio.play();
                 });
+
                 // Keyboard shortcuts
                 $(document).keydown(function(e) {
                     var unicode = e.charCode ? e.charCode : e.keyCode;
@@ -173,6 +141,33 @@
                 });
 
             });
+        }
+
+        $(function() {
+
+            var songList = Handlebars.compile( $("#song-list").html() );
+
+            // Setup the player to autoplay the next track
+            var a = audiojs.createAll({
+                trackEnded: function() {
+                    var $prev = $('ol li.playing');
+
+                    var songId = $prev.attr('list-id');
+                    console.log("POST /action/played/" + songId);
+
+                    $.ajax({
+                        url: "http://jukebox.inspectlabs.com/action/played/" + songId,
+                        method: "POST",
+                        dataType: "json",
+                    })
+                    .done(function(songs) {
+                        initPlaylist();
+                    });
+
+                }
+            });
+
+            initPlaylist();
         });
 
         function vote(songId, voter) {
