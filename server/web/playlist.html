@@ -169,6 +169,21 @@
 
 
             initPlaylist();
+
+            setInterval(function() {
+                $.getJSON("/music/playlist", function(songs) {
+                    _.each(songs, function(song) {
+                        var $votes = $("a[data-id='" + song._id + "']").find(".votes");
+                        var pastVotes = parseInt($votes.text());
+                        var votesAdded = parseInt(song.votes) - pastVotes;
+
+                        if (votesAdded > 0) {
+                            $votes.text(song.votes);
+                            notify("+" + votesAdded + " for " + song.name);
+                        }
+                    });
+                });
+            }, 5000);
         });
 
         function vote(songId, voter) {
