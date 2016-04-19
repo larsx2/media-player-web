@@ -21,6 +21,7 @@ var SongSchema = new Schema({
     album: Schema.Types.ObjectId,
     genres: Array,
     votes: Number, // for Playlist only
+    media_url: String,
 });
 var Song = mongoose.model('Song', SongSchema, 'songs');
 
