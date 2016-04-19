@@ -10,14 +10,14 @@
       h1 em { font-style: normal; color: #999; }
       a { color: #888; text-decoration: none; }
       #wrapper { width: 400px; margin: 40px auto; }
-      
+
       ol { padding: 0px; margin: 0px; list-style: decimal-leading-zero inside; color: #ccc; width: 460px; border-top: 1px solid #ccc; font-size: 0.9em; }
       ol li { position: relative; margin: 0px; padding: 9px 2px 10px; border-bottom: 1px solid #ccc; cursor: pointer; }
       ol li a { display: block; text-indent: -3.3ex; padding: 0px 0px 0px 20px; }
       li.playing { color: #aaa; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); }
       li.playing a { color: #000; }
       li.playing:before { content: '♬'; width: 14px; height: 14px; padding: 3px; line-height: 14px; margin: 0px; position: absolute; left: -24px; top: 9px; color: #000; font-size: 13px; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); }
-      
+
       #shortcuts { position: fixed; bottom: 0px; width: 100%; color: #666; font-size: 0.9em; margin: 60px 0px 0px; padding: 20px 20px 15px; background: #f3f3f3; background: rgba(240, 240, 240, 0.7); }
       #shortcuts div { width: 460px; margin: 0px auto; }
       #shortcuts h1 { margin: 0px 0px 6px; }
@@ -45,7 +45,7 @@
            </a>
        </li>
        {{/each}}
-    </script> 
+    </script>
     <script>
         function playNextSong(next) {
             if (! next) {
@@ -102,50 +102,8 @@
                 },
             });
         }
-     
-        function initPlaylist() {
-            $.getJSON("/music/playlist", function(songs) {
-                $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
-
-                // Load in the first track
-                var audio = a[0];
-                first = $('ol a').attr('data-src');
-                var $first = $('ol li').first();
-                $first.addClass('playing');
-                audio.load(first);
-                setName($first);
-                audio.play();
-
-                // Load in a track on click
-                $('ol li').click(function(e) {
-                    e.preventDefault();
-                    $(this).addClass('playing').siblings().removeClass('playing');
-                    setName($(this));
-                    audio.load($('a', this).attr('data-src'));
-                    audio.play();
-                });
-
-                // Keyboard shortcuts
-                $(document).keydown(function(e) {
-                    var unicode = e.charCode ? e.charCode : e.keyCode;
-                    // right arrow
-                    if (unicode == 39) {
-                        playNextSong()
-                            // back arrow
-                    } else if (unicode == 37) {
-                        playPrevSong()
-                            // spacebar
-                    } else if (unicode == 32) {
-                        audio.playPause();
-                    }
-                });
-
-            });
-        }
 
         $(function() {
-
-            var songList = Handlebars.compile( $("#song-list").html() );
 
             // Setup the player to autoplay the next track
             var a = audiojs.createAll({
@@ -166,6 +124,49 @@
 
                 }
             });
+
+            function initPlaylist() {
+                var songList = Handlebars.compile( $("#song-list").html() );
+
+                $.getJSON("/music/playlist", function(songs) {
+                    $("#playlist").html(songList({ songs: _.orderBy(songs, 'votes', 'desc') }));
+
+                    // Load in the first track
+                    var audio = a[0];
+                    first = $('ol a').attr('data-src');
+                    var $first = $('ol li').first();
+                    $first.addClass('playing');
+                    audio.load(first);
+                    setName($first);
+                    audio.play();
+
+                    // Load in a track on click
+                    $('ol li').click(function(e) {
+                        e.preventDefault();
+                        $(this).addClass('playing').siblings().removeClass('playing');
+                        setName($(this));
+                        audio.load($('a', this).attr('data-src'));
+                        audio.play();
+                    });
+
+                    // Keyboard shortcuts
+                    $(document).keydown(function(e) {
+                        var unicode = e.charCode ? e.charCode : e.keyCode;
+                        // right arrow
+                        if (unicode == 39) {
+                            playNextSong()
+                            // back arrow
+                        } else if (unicode == 37) {
+                            playPrevSong()
+                        // spacebar
+                        } else if (unicode == 32) {
+                            audio.playPause();
+                        }
+                    });
+
+                });
+            }
+
 
             initPlaylist();
         });
