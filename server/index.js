@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var url = require('url');
 var uuid = require('node-uuid');
 var express = require('express');
