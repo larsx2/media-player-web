@@ -26,6 +26,7 @@
     "hbsfy": "^2.7.0",
     "jquery": "^3.1.0",
     "lodash": "^4.13.1",
+    "noty": "^2.3.8",
     "video.js": "^5.10.4",
     "videojs-playlist": "^2.4.1",
     "vinyl-buffer": "^1.0.0",
