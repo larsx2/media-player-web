@@ -9,8 +9,8 @@ $(document).ready(function() {
     var videos = [];
 
     function loadVideos () {
-        $.getJSON('/music/playlist', function(videos) {
-            videos = _.orderBy(videos, 'votes', 'desc');
+        $.getJSON('/music/playlist', function(tracks) {
+            videos = _.orderBy(tracks, 'votes', 'desc');
             _.each(videos, function(video) {
                 videoList.push({
                     sources: [{
@@ -19,50 +19,63 @@ $(document).ready(function() {
                     }]
                 });
             });
+            var template = handlebars.compile(
+                $('#video-list').html()
+            );
+            var content = template({videos: videos});
+            $('#playlist-wrapper').html(content);
         });
     }
     loadVideos();
 
-    videojs('player').ready(function() {
-        var player = this;
-        player.playlist(videoList);
-        player.playlist.autoadvance(0);
+    setTimeout(function() {
+        videojs('player').ready(function() {
+            var player = this;
+            player.playlist(videoList);
+            //Starts player
+            $(function() {
+                $('#playlist li').first().trigger('click');
+            });
 
-        var template = handlebars.compile(
-            $('#video-list').html()
-        );
-        var content = template({videos: videos});
-        $('#playlist-wrapper').html(content);
+            //Events
+            $('#playlist li').on('click', function(e) {
+                e.preventDefault();
 
-        //Starts player
-        $(function() {
-            $('#playlist li').first().trigger('click');
+                $(this).addClass('playing').siblings().removeClass('playing');
+                //set video details
+                var artist = $(this).find('a').attr('data-band');
+                var song = $(this).find('.video-name').text();
+                $('#band-name').text(artist);
+                $('#song-name').text(song);
+
+                player.playlist.currentItem($(this).index());
+                player.play();
+            });
+
+            //Listener
+            player.on('ended', function() {
+                var songId = $('li.playing').find('a').attr('data-id');
+                $.post("/action/played/" + songId).done(function(songs) {
+                    loadVideos();
+                    player.playlist.first();
+                    //player.play();
+                });
+            });
+
+            setInterval(function() {
+                $.getJSON('/music/playlist', function(videos) {
+                    _.each(videos, function(video) {
+                        var votes = $("a[data-id='" + video._id + "']").find(".votes");
+                        var pastVotes = parseInt(votes.text());
+                        var votesAdded = parseInt(video.votes) - pastVotes;
+
+                        if (votesAdded > 0) {
+                            votes.text(video.votes);
+                        }
+                    });
+                });
+            }, 1000);
         });
-
-
-        //Events
-        $('#playlist li').on('click', function(e) {
-            e.preventDefault();
-            
-            $(this).addClass('playing').siblings().removeClass('playing'); 
-            //set video details
-            var artist = $(this).find('a').attr('data-band');
-            var song = $(this).find('.video-name').text();
-            $('#band-name').text(artist);
-            $('#song-name').text(song);
-            
-            player.playlist.currentItem($(this).index());
-            player.play();
-        });
-
-        //Listener
-        player.on('ended', function() {
-            console.log('Video ended!');
-            loadVideos();
-            player.playlist.first();
-            player.play();
-        });
-
-    });
+    }, 1000);
     //videojs.options.flash.swf = "../node_modules/video.js/dist/video-js.swf"
 });
