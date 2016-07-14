@@ -20,7 +20,7 @@ $(document).ready(function() {
             _.each(videos, function(video) {
                 videoList.push({
                     sources: [{
-                        src: video.media_url,
+                        src: video.video_url,
                         type: 'video/mp4'
                     }]
                 });

@@ -17,7 +17,7 @@ var logger = require('morgan');
 var log = require('winston');
 
 var app = express();
-var PORT = 3000;
+var PORT = 80;
 
 var music = require('./routes/music');
 var venue = require('./routes/venue');
@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(serveStatic('web', {'index': 'playlist.html'}));
 app.use(serveStatic('web/audio'));
-app.use(serveStatic('web/public/videos'));
+app.use(serveStatic('web/videos'));
 
 app.use(cookieSession({
   name: 'session',
