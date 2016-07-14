@@ -29,6 +29,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(serveStatic('web', {'index': 'playlist.html'}));
 app.use(serveStatic('web/audio'));
+app.use(serveStatic('web/public/videos'));
 
 app.use(cookieSession({
   name: 'session',
